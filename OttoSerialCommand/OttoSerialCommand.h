@@ -17,7 +17,7 @@
 
 #include <string.h>
 
-#define LARGE_MEMORY_CPU !(defined(__AVR_ATmega328p__) || defined(__AVR_ATmega168__))
+#define LARGE_MEMORY_CPU !(defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__))
 #if LARGE_MEMORY_CPU
 # include "Stream.h"
 #endif
