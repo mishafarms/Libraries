@@ -21,6 +21,12 @@
 #include <Adafruit_NeoPixel.h> // Library to manage the Neopixel RGB led
 #include <OttoSerialCommand.h> //-- Library to manage serial commands
 OttoSerialCommand SCmd;  // The SerialCommand object
+#if LARGE_MEMORY_CPU
+# define ottoSerial SCmd
+#else
+# define ottoSerial Serial
+#endif
+
 #include <Otto9.h> //-- Otto Library version 9
 Otto9 Otto;  //This is Otto!
 //---------------------------------------------------------
@@ -135,7 +141,7 @@ unsigned long timerMillis = 0;
 ///////////////////////////////////////////////////////////////////
 void setup() {
   //Serial communication initialization
-  SCmd.begin(SERIAL_BAUD);
+  ottoSerial.begin(SERIAL_BAUD);
   Otto.init(PIN_YL, PIN_YR, PIN_RL, PIN_RR, true, PIN_NoiseSensor, PIN_Buzzer, PIN_Trigger, PIN_Echo); //Set the servo pins and ultrasonic pins
   Otto.initMATRIX( DIN_PIN, CS_PIN, CLK_PIN, LED_DIRECTION);   // set up Matrix display pins = DIN pin,CS pin, CLK pin, MATRIX orientation 
   Otto.matrixIntensity(1);// set up Matrix display intensity
@@ -212,7 +218,7 @@ Otto.putMouth(smile);
 //-- Principal Loop ---------------------------------------------//
 ///////////////////////////////////////////////////////////////////
 void loop() {
- if (SCmd.available() > 0 && MODE != 4) {
+ if (ottoSerial.available() > 0 && MODE != 4) {
     MODE=4;
   }
   //Every 60 seconds check battery level
@@ -714,11 +720,11 @@ void receiveName() {
 void requestDistance() {
   Otto.home();  //stop if necessary
   int distance = Otto.getDistance();
-  SCmd.print(F("&&"));
-  SCmd.print(F("D "));
-  SCmd.print(distance);
-  SCmd.println(F("%%"));
-  SCmd.flush();
+  ottoSerial.print(F("&&"));
+  ottoSerial.print(F("D "));
+  ottoSerial.print(distance);
+  ottoSerial.println(F("%%"));
+  ottoSerial.flush();
 }
 
 //-- Function to send battery voltage percent
@@ -726,40 +732,40 @@ void requestBattery() {
   Otto.home();  //stop if necessary
   //The first read of the battery is often a wrong reading, so we will discard this value.
   double batteryLevel = Otto.getBatteryLevel();
-  SCmd.print(F("&&"));
-  SCmd.print(F("B "));
-  SCmd.print(batteryLevel);
-  SCmd.println(F("%%"));
-  SCmd.flush();
+  ottoSerial.print(F("&&"));
+  ottoSerial.print(F("B "));
+  ottoSerial.print(batteryLevel);
+  ottoSerial.println(F("%%"));
+  ottoSerial.flush();
 }
 
 //-- Function to send program ID
 void requestProgramId() {
   Otto.home();   //stop if necessary
-  SCmd.print(F("&&"));
-  SCmd.print(F("I "));
-  SCmd.print(programID);
-  SCmd.println(F("%%"));
-  SCmd.flush();
+  ottoSerial.print(F("&&"));
+  ottoSerial.print(F("I "));
+  ottoSerial.print(programID);
+  ottoSerial.println(F("%%"));
+  ottoSerial.flush();
 }
 
 
 //-- Function to send Ack comand (A)
 void sendAck() {
   delay(30);
-  SCmd.print(F("&&"));
-  SCmd.print(F("A"));
-  SCmd.println(F("%%"));
-  SCmd.flush();
+  ottoSerial.print(F("&&"));
+  ottoSerial.print(F("A"));
+  ottoSerial.println(F("%%"));
+  ottoSerial.flush();
 }
 
 //-- Function to send final Ack comand (F)
 void sendFinalAck() {
   delay(30);
-  SCmd.print(F("&&"));
-  SCmd.print(F("F"));
-  SCmd.println(F("%%"));
-  SCmd.flush();
+  ottoSerial.print(F("&&"));
+  ottoSerial.print(F("F"));
+  ottoSerial.println(F("%%"));
+  ottoSerial.flush();
 }
 //-- Function to receive mode selection.
 void requestMode() {
